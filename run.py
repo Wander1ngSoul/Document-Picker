@@ -80,9 +80,10 @@ class DocumentMerger:
                 pass
         self.temp_files.clear()
 
-    def _format_cell(self, cell, text="", font_size=14, bold=False, alignment=WD_ALIGN_PARAGRAPH.LEFT):
+    def _format_cell(self, cell, text="", font_size=14, bold=False, alignment=WD_ALIGN_PARAGRAPH.LEFT,
+                     vertical_align=WD_ALIGN_VERTICAL.TOP):
         cell.text = text
-        cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+        cell.vertical_alignment = vertical_align
         cell.margin_left = Cm(0)
         cell.margin_right = Cm(0)
         cell.margin_top = Cm(0)
@@ -93,9 +94,9 @@ class DocumentMerger:
         paragraph.paragraph_format.space_after = Pt(0)
         paragraph.paragraph_format.line_spacing_rule = WD_LINE_SPACING.SINGLE
         paragraph.alignment = alignment
-        paragraph.paragraph_format.left_indent = Cm(0)
-        paragraph.paragraph_format.first_line_indent = Cm(0)
-        paragraph.paragraph_format.right_indent = Cm(0)
+        paragraph.paragraph_format.left_indent = Pt(0)
+        paragraph.paragraph_format.first_line_indent = Pt(0)
+        paragraph.paragraph_format.right_indent = Pt(0)
 
         for run in paragraph.runs:
             run.font.name = 'Times New Roman'
@@ -154,24 +155,24 @@ class DocumentMerger:
         ]
         for i, header in enumerate(headers):
             self._format_cell(table.rows[0].cells[i], header, font_size=14, bold=False,
-                              alignment=WD_ALIGN_PARAGRAPH.CENTER)
+                              alignment=WD_ALIGN_PARAGRAPH.CENTER, vertical_align=WD_ALIGN_VERTICAL.CENTER)
 
         for i in range(8):
             self._format_cell(table.rows[1].cells[i], str(i + 1), font_size=10, bold=False,
-                              alignment=WD_ALIGN_PARAGRAPH.CENTER)
+                              alignment=WD_ALIGN_PARAGRAPH.CENTER, vertical_align=WD_ALIGN_VERTICAL.CENTER)
 
-        row_number = 1
         for data in self.data_rows:
             row_cells = table.add_row().cells
             for col_idx in range(8):
                 if col_idx == 0:
-                    self._format_cell(row_cells[0], "", font_size=14, alignment=WD_ALIGN_PARAGRAPH.CENTER)
+                    self._format_cell(row_cells[0], "", font_size=14, alignment=WD_ALIGN_PARAGRAPH.CENTER,
+                                      vertical_align=WD_ALIGN_VERTICAL.TOP)
                 elif col_idx < len(data):
                     align = WD_ALIGN_PARAGRAPH.LEFT if col_idx == 1 else WD_ALIGN_PARAGRAPH.JUSTIFY
-                    self._format_cell(row_cells[col_idx], data[col_idx], font_size=14, alignment=align)
+                    self._format_cell(row_cells[col_idx], data[col_idx], font_size=14, alignment=align,
+                                      vertical_align=WD_ALIGN_VERTICAL.TOP)
                 else:
-                    self._format_cell(row_cells[col_idx], "", font_size=14)
-            row_number += 1
+                    self._format_cell(row_cells[col_idx], "", font_size=14, vertical_align=WD_ALIGN_VERTICAL.TOP)
 
         self.set_column_widths(table)
         return table
